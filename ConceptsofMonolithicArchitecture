@@ -1,0 +1,28 @@
+# MONOLITHIC ARCHITECTURE
+
+ A monolithic architecture in AWS is like building a single, large application where all components are tightly integrated and run as one unit.
+
+### Key Points:
+- **Single Codebase**: All parts of the application (like the user interface, business logic, and data access) are combined in one codebase.
+- **Single Deployment**: The entire application is deployed together. Any change, even a small one, requires the whole application to be rebuilt and redeployed.
+- **Tightly Coupled**: Components are interconnected and depend on each other. If one part fails, it can affect the entire system.
+- **Scalability**: Scaling the application means replicating the entire system, which can be inefficient.
+  
+### In AWS Context:
+- **EC2 Instances**: The monolithic application can run on Amazon EC2 instances. You can use auto-scaling groups to handle traffic changes.
+- **Single Database**: Often, a monolithic app uses a single database instance (like Amazon RDS) to manage data.
+- **Elastic Load Balancing**: AWS Elastic Load Balancing can distribute incoming traffic across multiple EC2 instances running your monolithic app.
+- **S3 for Storage**: Amazon S3 can be used for storing static files, backups, and other data.
+- **Simple Deployment**: Services like AWS Elastic Beanstalk can simplify deployment and management of your monolithic app by handling capacity provisioning, load balancing, and scaling.
+
+### Example:
+Imagine you have an online store application. In a monolithic architecture:
+- The website frontend, product catalog, user accounts, and payment processing are all in one single codebase.
+- You deploy this entire application on a group of EC2 instances.
+- A single RDS database holds all the application data.
+
+### Pros and Cons:
+- **Pros**: Simpler to develop, test, and deploy initially. Easier to manage for small applications.
+- **Cons**: Harder to scale, maintain, and update as the application grows. A change in one part can require redeploying the whole application.
+
+This should give you a basic understanding of monolithic architecture within the AWS ecosystem! 
