@@ -1,0 +1,144 @@
+I've created two EC2 instances, one for WordPress and one for MySQL, and configuring them. Here's a step-by-step guide:
+
+### Step 1: Launch EC2 Instances
+
+1. **Log in to AWS Management Console**:
+   - Navigate to the EC2 Dashboard.
+
+2. **Launch WordPress EC2 Instance**:
+   - Click on “Launch Instance”.
+   - Choose an Amazon Machine Image (AMI): Select the latest Amazon Linux 2 AMI.
+   - Choose an Instance Type: Select `t2.micro` (free tier eligible).
+   - Configure Instance Details: You can leave the default settings.
+   - Add Storage: Use the default settings (8 GB).
+   - Add Tags: Add a tag with Key = `Name` and Value = `WordPress-Instance`.
+   - Configure Security Group: Create a new security group allowing SSH (port 22), HTTP (port 80), and HTTPS (port 443) access.
+   - Review and Launch: Click “Review and Launch” and then “Launch”.
+   - Select a key pair or create a new one for SSH access.
+
+3. **Launch MySQL EC2 Instance**:
+   - Repeat the steps above to launch a second EC2 instance.
+   - Add Tags: Add a tag with Key = `Name` and Value = `MySQL-Instance`.
+   - Configure Security Group: Create a new security group allowing SSH (port 22) and MySQL (port 3306) access.
+   - Review and Launch: Click “Review and Launch” and then “Launch”.
+   - Select a key pair or create a new one for SSH access.
+
+### Step 2: Configure MySQL on MySQL Instance
+
+1. **Connect to MySQL Instance**:
+   - Use the key pair to SSH into your MySQL instance:
+     
+     ssh -i /path/to/your-key-pair.pem ec2-user@<MySQL-Instance-Public-IP>
+     
+
+2. **Install MySQL Server**:
+   - Update the package list and install MySQL:
+     
+     sudo yum update -y
+     sudo yum install -y mariadb-server
+    
+
+3. **Start and Enable MySQL Service**:
+   - Start and enable the MySQL service:
+     
+     sudo systemctl start mariadb
+     sudo systemctl enable mariadb
+     
+
+4. **Secure MySQL Installation**:
+   - Run the MySQL secure installation script:
+     
+     sudo mysql_secure_installation
+     
+
+5. **Create WordPress Database and User**:
+   - Log in to MySQL and create the necessary database and user:
+     
+     sudo mysql -u root -p
+     
+   - In the MySQL prompt, execute the following:
+     
+     CREATE DATABASE wordpress;
+     CREATE USER 'wordpressuser'@'%' IDENTIFIED BY 'yourpassword';
+     GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'%';
+     FLUSH PRIVILEGES;
+     EXIT;
+     
+
+6. **Edit MySQL Configuration to Allow Remote Access**:
+   - Edit the MySQL configuration file:
+     
+     sudo vi /etc/my.cnf
+     
+   - Find the line `bind-address` and comment it out by adding a `#` at the beginning of the line:
+     
+     #bind-address=127.0.0.1
+     
+   - Restart MySQL service:
+     
+     sudo systemctl restart mariadb
+     
+
+### Step 3: Configure WordPress on WordPress Instance
+
+1. **Connect to WordPress Instance**:
+   - Use the key pair to SSH into your WordPress instance:
+     
+     ssh -i /path/to/your-key-pair.pem ec2-user@<WordPress-Instance-Public-IP>
+     
+
+2. **Install Apache, PHP, and WordPress**:
+   - Update the package list and install Apache and PHP:
+     
+     sudo yum update -y
+     sudo yum install -y httpd php php-mysqlnd
+     
+
+3. **Start and Enable Apache Service**:
+   - Start and enable the Apache service:
+     
+     sudo systemctl start httpd
+     sudo systemctl enable httpd
+     
+
+4. **Download and Configure WordPress**:
+   - Download and configure WordPress:
+     
+     cd /var/www/html
+     sudo wget https://wordpress.org/latest.tar.gz
+     sudo tar -xzf latest.tar.gz
+     sudo cp -r wordpress/* .
+     sudo rm -rf wordpress latest.tar.gz
+     sudo chown -R apache:apache /var/www/html
+     sudo chmod -R 755 /var/www/html
+     
+
+5. **Configure WordPress to Connect to MySQL Database**:
+   - Copy the sample configuration file:
+     
+     sudo cp wp-config-sample.php wp-config.php
+     sudo vi wp-config.php
+     
+   - Update the following lines with your database information:
+     
+     define('DB_NAME', 'wordpress');
+     define('DB_USER', 'wordpressuser');
+     define('DB_PASSWORD', 'yourpassword');
+     define('DB_HOST', '<MySQL-Instance-Public-IP>');
+     
+
+6. **Restart Apache Service**:
+   - Restart Apache to apply changes:
+     
+     sudo systemctl restart httpd
+     
+
+### Step 4: Complete WordPress Installation via Web Browser
+
+1. **Access WordPress Setup**:
+   - Open a web browser and navigate to `http://<WordPress-Instance-Public-IP>`.
+   - Follow the on-screen instructions to complete the WordPress setup.
+
+### Summary
+
+I have successfully launched two EC2 instances, configured one as a MySQL server, and the other as a WordPress server. The WordPress instance is configured to connect to the MySQL instance. 
